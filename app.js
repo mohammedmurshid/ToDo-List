@@ -1,52 +1,43 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const ejs = require("ejs");
+const date = require(__dirname + "/date.js");
 
 const app = express();
 
+const items = ["Wake Up", "Do Workout", "Get Ready", "Eat Food", "Drive to Office"];
+
 app.set("view engine", "ejs");
 
+app.use(bodyParser.urlencoded({extended: true}));
+app.use(express.static("public"));
+
+// showing the home route
 app.get("/", (req, res) => {
 
-    var today = new Date();
-    var currentDay = today.getDay();
-    var day = "";
-
-    // if(today.getDay() == 6 || today.getDay() == 0) {        
-    //     day = "weekend";
-    // } else {        
-    //     day = "weekday";
-    // }
-
-    switch (currentDay) {
-        case 0:
-            day = "Sunday";
-            break;
-        case 1:
-            day = "Monday";
-            break;
-        case 2:
-            day = "Tuesday";
-            break;
-        case 3:
-            day = "Wednesday";
-            break;
-        case 4:
-            day = "Thursday";
-            break;
-        case 5:
-            day = "Friday";
-            break;
-        case 6:
-            day = "Saturday";
-            break;    
-        default:
-            console.log();            
-    }
-
-    res.render("list", {kindOfDay: day});
+    const day = date.getDate();  // Shows the entire date
+    // const day = date.getDay(); // Show the day only
+    
+    res.render("list", {
+        kindOfDay: day,
+        newListItems: items
+    });
 });
 
+// getting the post request from form input
+app.post("/", (req, res) => {
+    const item = req.body.newItem;
+
+    items.push(item);
+
+    res.redirect("/");
+    
+    // console.log(item);
+});
+
+app.get("/about", (req, res) => {
+    res.render("about");
+});
 
 app.listen(1234, () => {
     console.log("server running on port 1234")
